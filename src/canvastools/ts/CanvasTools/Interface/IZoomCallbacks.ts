@@ -29,10 +29,10 @@ export interface IZoomCallbacks {
     /**
      * Set the canvas draggable when it is zooming in
      */
-    toggleDragging: () => void;
+    onDragActivated: () => void;
 
     /**
      * Remove event listener for dragging
      */
-    onEndDragging: () => void;
+    onDragDeactivated: () => void;
 }

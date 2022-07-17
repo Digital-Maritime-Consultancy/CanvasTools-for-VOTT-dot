@@ -11,7 +11,7 @@
     <div id="canvasToolsDiv">
         <div id="toolbarDiv">
         </div>
-        <div id="selectionDiv" onmousewheel="onWheelCapture(event)">
+        <div id="selectionDiv" onmousewheel="onWheelCapture(event)" onkeydown="onKeyDown(event)" onkeyup="onKeyUp(event)">
             <div id="editorDiv"></div>
         </div>
     </div>
@@ -87,11 +87,6 @@
         // Add new region to the editor when new region is created
         editor.onSelectionEnd = (regionData) => {
             let id = (incrementalRegionID++).toString();
-
-            const scaledRegionData = editor.scaleRegionToSourceSize(
-            regionData, 100, 100,
-            );
-            console.log(scaledRegionData);
 
             // Generate random tag
             let tags = generateRandomTagsDescriptor();            
@@ -221,7 +216,6 @@
         var showZoomDiv = document.getElementById("showZoomFactor");
         editor.onZoomEnd = function (zoom) {
             showZoomDiv.innerText = "Image zoomed at " + zoom.currentZoomScale*100 + " %";
-            console.log(zoom.maxZoomScale);
         }
 
         // check if reset zoom is On.
@@ -303,6 +297,22 @@
         x = x - window.pageXOffset;
         y = y - window.pageYOffset;
         return {x : x, y : y};
+    }
+
+    function onKeyDown(e) {
+        if (!e.ctrlKey && !e.shiftKey && e.altKey && editor) {
+            if (editor.ZM.isZoomEnabled && !editor.ZM.isDraggingEnabled) {
+                editor.ZM.callbacks.onDragActivated();
+            }
+        }
+    }
+
+    function onKeyUp(e) {
+        if (editor) {
+            if (editor.ZM.isZoomEnabled) {
+                editor.ZM.callbacks.onDragDeactivated();
+            }
+        }
     }
 </script>
 

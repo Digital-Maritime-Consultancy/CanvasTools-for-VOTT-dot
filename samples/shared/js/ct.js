@@ -3973,18 +3973,20 @@ class Editor {
                 this.onZoom(ZoomManager_1.ZoomDirection.In, newZoomScale);
                 return this.zoomManager.getZoomData();
             },
-            toggleDragging: () => {
-                if (!this.zoomManager.isDraggingEnabled) {
-                    this.AS.setSelectionMode(ISelectorSettings_1.SelectionMode.NONE);
-                    this.RM.freeze();
-                    this.zoomManager.setDragging(true);
+            onDragActivated: () => {
+                this.previousSelectionMode = this.AS.getSelectorSettings() ?
+                    this.AS.getSelectorSettings().mode : undefined;
+                this.AS.setSelectionMode(ISelectorSettings_1.SelectionMode.NONE);
+                this.RM.freeze();
+                this.zoomManager.setDragging(true);
+            },
+            onDragDeactivated: () => {
+                if (this.previousSelectionMode) {
+                    this.AS.setSelectionMode(this.previousSelectionMode);
                 }
                 else {
-                    this.regionsManager.unfreeze();
-                    this.zoomManager.setDragging(false);
+                    this.AS.setSelectionMode(ISelectorSettings_1.SelectionMode.NONE);
                 }
-            },
-            onEndDragging: () => {
                 this.regionsManager.unfreeze();
                 this.zoomManager.setDragging(false);
             }
@@ -4344,7 +4346,7 @@ Editor.FullToolbarSet = [
         tooltip: "Regions Manipulation (M)",
         key: ["M", "m"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             sl.setSelectionMode({ mode: ISelectorSettings_1.SelectionMode.NONE });
         },
         activate: false,
@@ -4359,7 +4361,7 @@ Editor.FullToolbarSet = [
         tooltip: "Point-selection (P)",
         key: ["P", "p"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             sl.setSelectionMode({ mode: ISelectorSettings_1.SelectionMode.POINT });
             sl.show();
         },
@@ -4372,7 +4374,7 @@ Editor.FullToolbarSet = [
         tooltip: "Rectangular box (R)",
         key: ["R", "r"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             sl.setSelectionMode({ mode: ISelectorSettings_1.SelectionMode.RECT });
             sl.show();
         },
@@ -4385,7 +4387,7 @@ Editor.FullToolbarSet = [
         tooltip: "Template-based box (T)",
         key: ["T", "t"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             const regions = rm.getSelectedRegions();
             if (regions !== undefined && regions.length > 0) {
                 const r = regions[0];
@@ -4411,7 +4413,7 @@ Editor.FullToolbarSet = [
         tooltip: "Polyline-selection (Y)",
         key: ["Y", "y"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             sl.setSelectionMode({ mode: ISelectorSettings_1.SelectionMode.POLYLINE });
             sl.show();
         },
@@ -4424,7 +4426,7 @@ Editor.FullToolbarSet = [
         tooltip: "Polygon-selection (O)",
         key: ["O", "o"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             ConfigurationManager_1.ConfigurationManager.isModifyRegionOnlyMode = false;
             sl.setSelectionMode({ mode: ISelectorSettings_1.SelectionMode.POLYGON });
             sl.show();
@@ -4438,7 +4440,7 @@ Editor.FullToolbarSet = [
         tooltip: "Polygon add/remove points (U)",
         key: ["U", "u"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             if (!ConfigurationManager_1.ConfigurationManager.isModifyRegionOnlyMode) {
                 ConfigurationManager_1.ConfigurationManager.isModifyRegionOnlyMode = true;
                 sl.setSelectionMode({ mode: ISelectorSettings_1.SelectionMode.POLYGON });
@@ -4495,7 +4497,7 @@ Editor.RectToolbarSet = [
         tooltip: "Regions Manipulation (M)",
         key: ["M", "m"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             sl.setSelectionMode({ mode: ISelectorSettings_1.SelectionMode.NONE });
         },
         activate: false,
@@ -4510,7 +4512,7 @@ Editor.RectToolbarSet = [
         tooltip: "Rectangular box (R)",
         key: ["R", "r"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             sl.setSelectionMode({ mode: ISelectorSettings_1.SelectionMode.RECT });
             sl.show();
         },
@@ -4523,7 +4525,7 @@ Editor.RectToolbarSet = [
         tooltip: "Template-based box (T)",
         key: ["T", "t"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.onEndDragging();
+            zm.callbacks.onDragDeactivated();
             const regions = rm.getSelectedRegionsWithZoomScale();
             if (regions !== undefined && regions.length > 0) {
                 const r = regions[0];
@@ -4605,13 +4607,13 @@ Editor.ZoomIconGroupToolbar = [
         activate: false,
     },
     {
-        type: ToolbarIcon_1.ToolbarItemType.SWITCH,
+        type: ToolbarIcon_1.ToolbarItemType.SELECTOR,
         action: ToolbarAction_1.ToolbarAction.ZOOM_DRAG,
         iconFile: "zoom-drag.svg",
         tooltip: "Dragging for zoom-in (U)",
         key: ["Z", "z"],
         actionCallback: (action, rm, sl, zm) => {
-            zm.callbacks.toggleDragging();
+            zm.callbacks.onDragActivated();
         },
         activate: false,
     },
