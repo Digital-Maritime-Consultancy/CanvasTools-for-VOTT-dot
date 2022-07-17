@@ -107,7 +107,7 @@ export class Editor {
             tooltip: "Regions Manipulation (M)",
             key: ["M", "m"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 sl.setSelectionMode({ mode: SelectionMode.NONE });
             },
             activate: false,
@@ -122,7 +122,7 @@ export class Editor {
             tooltip: "Point-selection (P)",
             key: ["P", "p"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 sl.setSelectionMode({ mode: SelectionMode.POINT });
                 sl.show();
             },
@@ -135,7 +135,7 @@ export class Editor {
             tooltip: "Rectangular box (R)",
             key: ["R", "r"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 sl.setSelectionMode({ mode: SelectionMode.RECT });
                 sl.show();
             },
@@ -148,7 +148,7 @@ export class Editor {
             tooltip: "Template-based box (T)",
             key: ["T", "t"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 const regions = rm.getSelectedRegions();
                 if (regions !== undefined && regions.length > 0) {
                     const r = regions[0];
@@ -173,7 +173,7 @@ export class Editor {
             tooltip: "Polyline-selection (Y)",
             key: ["Y", "y"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 sl.setSelectionMode({ mode: SelectionMode.POLYLINE });
                 sl.show();
             },
@@ -186,7 +186,7 @@ export class Editor {
             tooltip: "Polygon-selection (O)",
             key: ["O", "o"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 ConfigurationManager.isModifyRegionOnlyMode = false;
                 sl.setSelectionMode({ mode: SelectionMode.POLYGON });
                 sl.show();
@@ -200,7 +200,7 @@ export class Editor {
             tooltip: "Polygon add/remove points (U)",
             key: ["U", "u"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 if (!ConfigurationManager.isModifyRegionOnlyMode) {
                     ConfigurationManager.isModifyRegionOnlyMode = true;
                     sl.setSelectionMode({ mode: SelectionMode.POLYGON });
@@ -261,7 +261,7 @@ export class Editor {
             tooltip: "Regions Manipulation (M)",
             key: ["M", "m"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 sl.setSelectionMode({ mode: SelectionMode.NONE });
             },
             activate: false,
@@ -276,7 +276,7 @@ export class Editor {
             tooltip: "Rectangular box (R)",
             key: ["R", "r"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 sl.setSelectionMode({ mode: SelectionMode.RECT });
                 sl.show();
             },
@@ -289,7 +289,7 @@ export class Editor {
             tooltip: "Template-based box (T)",
             key: ["T", "t"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.onEndDragging();
+                zm.callbacks.onDragDeactivated();
                 const regions = rm.getSelectedRegionsWithZoomScale();
                 if (regions !== undefined && regions.length > 0) {
                     const r = regions[0];
@@ -374,13 +374,13 @@ export class Editor {
             activate: false,
         },
         {
-            type: ToolbarItemType.SWITCH,
+            type: ToolbarItemType.SELECTOR,
             action: ToolbarAction.ZOOM_DRAG,
             iconFile: "zoom-drag.svg",
             tooltip: "Dragging for zoom-in (U)",
             key: ["Z", "z"],
             actionCallback: (action, rm, sl, zm) => {
-                zm.callbacks.toggleDragging();
+                zm.callbacks.onDragActivated();
             },
             activate: false,
         },
@@ -527,6 +527,8 @@ export class Editor {
      * Internal reference to the RegionsManager freezing state.
      */
     private isRMFrozen: boolean = false;
+
+    private previousSelectionMode: SelectionMode;
 
     /**
      * The width of the source content.
@@ -721,17 +723,19 @@ export class Editor {
                 this.onZoom(ZoomDirection.In, newZoomScale);
                 return this.zoomManager.getZoomData();
             },
-            toggleDragging: () => {
-                if (!this.zoomManager.isDraggingEnabled) {
-                    this.AS.setSelectionMode(SelectionMode.NONE);
-                    this.RM.freeze();
-                    this.zoomManager.setDragging(true);
-                } else {
-                    this.regionsManager.unfreeze();
-                    this.zoomManager.setDragging(false);
-                }
+            onDragActivated: () => {
+                this.previousSelectionMode = this.AS.getSelectorSettings() ?
+                    this.AS.getSelectorSettings().mode : undefined;
+                this.AS.setSelectionMode(SelectionMode.NONE);
+                this.RM.freeze();
+                this.zoomManager.setDragging(true);
             },
-            onEndDragging: () => {
+            onDragDeactivated: () => {
+                if (this.previousSelectionMode) {
+                    this.AS.setSelectionMode(this.previousSelectionMode);
+                } else {
+                    this.AS.setSelectionMode(SelectionMode.NONE);
+                }
                 this.regionsManager.unfreeze();
                 this.zoomManager.setDragging(false);
             }
