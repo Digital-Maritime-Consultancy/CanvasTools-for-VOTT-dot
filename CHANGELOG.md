@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.1.3
+* Dragging support for zoomed-in canvas
+
 ### 0.1.2
 * Generalization of ToolbarIcon - introducing ToolbarSelect
 
