@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.1.4
+* Escape key bug fix
+
 ### 0.1.3
 * Dragging support for zoomed-in canvas
 
