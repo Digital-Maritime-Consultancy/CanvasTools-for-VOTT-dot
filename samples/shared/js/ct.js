@@ -7864,7 +7864,7 @@ class PolygonSelector extends Selector_1.Selector {
                 event: "keyup",
                 base: window,
                 listener: (e) => {
-                    if (e.code === "Escape") {
+                    if (e.code === "Escape" && this.isCapturing) {
                         this.submitPolygon();
                     }
                 },
@@ -8082,7 +8082,7 @@ class PolylineSelector extends Selector_1.Selector {
         return points;
     }
     onKeyUp(e) {
-        if (e.code === "Escape") {
+        if (e.code === "Escape" && this.isCapturing) {
             this.submitPolyline();
         }
     }
