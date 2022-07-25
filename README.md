@@ -5,6 +5,7 @@
 * Region (box, point, polyline & polygon) selection & manipulation
 * Filters pipeline for underlaying canvas element
 * Toolbar for all available tools
+* Zoom in and out support
 
 ## Dependencies
 
@@ -12,6 +13,12 @@
 * Current version of the library depends on some features (e.g., masks-support in SVG) that are not fully cross-browser, but are targeting Electron (Chromium).
 
 ## How to use
+
+You can build the library through
+
+```
+npm run build
+```
 
 ### Install npm package
 

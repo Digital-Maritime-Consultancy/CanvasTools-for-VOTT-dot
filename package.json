@@ -1,5 +1,5 @@
 {
-  "name": "@jinkijung/vott-dot-ct",
+  "name": "@digital-maritime-consultancy/vott-dot-ct",
   "version": "0.1.4",
   "description": "CanvasTools editor for the VoTT-dot project (forked from VoTT-CT)",
   "main": "./lib/js/ct.js",
