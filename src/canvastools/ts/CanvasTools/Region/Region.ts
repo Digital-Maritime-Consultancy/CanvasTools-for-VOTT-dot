@@ -1,4 +1,5 @@
 import { Rect } from "../Core/Rect";
+import { RegionAttribute } from "../Core/RegionAttribute";
 import { RegionData } from "../Core/RegionData";
 import { TagsDescriptor } from "../Core/TagsDescriptor";
 
@@ -26,6 +27,11 @@ export abstract class Region extends RegionComponent {
      * Internal region ID. Used to simplify debugging and for styling.
      */
     public regionID: string;
+
+    /**
+     * Internal region attributes. used to annotate specific attributes to a region.
+     */
+    public attributes: RegionAttribute;
 
     /**
      * Building blocks of the region component.
@@ -58,7 +64,7 @@ export abstract class Region extends RegionComponent {
      * @param tagsUpdateOptions - The drawing options for tags.
      */
     constructor(paper: Snap.Paper, paperRect: Rect = null, regionData: RegionData, callbacks: IRegionCallbacks,
-                id: string, tagsDescriptor: TagsDescriptor, tagsUpdateOptions?: ITagsUpdateOptions) {
+                id: string, tagsDescriptor: TagsDescriptor, attributes: RegionAttribute, tagsUpdateOptions?: ITagsUpdateOptions) {
         super(paper, paperRect, regionData, Object.assign({}, callbacks));
 
         this.ID = id;
@@ -68,6 +74,7 @@ export abstract class Region extends RegionComponent {
         this.styleID = `region_${this.regionID}_style`;
         this.styleSheet = this.insertStyleSheet();
         this.tagsUpdateOptions = tagsUpdateOptions;
+        this.attributes = attributes ? attributes : {test:"test"};
 
         this.UI = [];
 

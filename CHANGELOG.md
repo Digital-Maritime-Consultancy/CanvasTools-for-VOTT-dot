@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.1.5
+* Support of region attributes
+
 ### 0.1.4
 * Escape key bug fix
 

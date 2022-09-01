@@ -5,6 +5,7 @@ import { TagsDescriptor } from "../Core/TagsDescriptor";
 import { ChangeEventType } from "../Interface/IRegionCallbacks";
 import { IRegionsManagerCallbacks } from "../Interface/IRegionsManagerCallbacks";
 import { ITagsUpdateOptions } from "../Interface/ITagsUpdateOptions";
+import { RegionAttribute } from './../Core/RegionAttribute';
 import { ZoomManager } from "./../Core/ZoomManager";
 import { RegionComponent } from "./Component/RegionComponent";
 import { PathRegion } from "./Path/PathRegion";
@@ -196,7 +197,7 @@ export class RegionsManager {
         this.menu.hide();
 
         const region = new RectRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                      this.tagsUpdateOptions);
+                                      {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -211,7 +212,7 @@ export class RegionsManager {
         this.menu.hide();
 
         const region = new PointRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                       this.tagsUpdateOptions);
+                                       {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -226,7 +227,7 @@ export class RegionsManager {
         this.menu.hide();
 
         const region = new PolylineRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                          this.tagsUpdateOptions);
+                                          {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -241,7 +242,7 @@ export class RegionsManager {
         this.menu.hide();
 
         const region = new PolygonRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                         this.tagsUpdateOptions);
+                                         {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -256,7 +257,7 @@ export class RegionsManager {
         this.menu.hide();
 
         const region = new PathRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                         this.tagsUpdateOptions);
+                                         {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -294,12 +295,13 @@ export class RegionsManager {
     /**
      * Returns a collection of all the regions currently drawn on the canvas
      */
-    public getAllRegions(): Array<{ id: string, tags: TagsDescriptor, regionData: RegionData }> {
+    public getAllRegions(): Array<{ id: string, tags: TagsDescriptor, regionData: RegionData, attributes: RegionAttribute }> {
         return this.regions.map((region) => {
             return {
                 id: region.ID,
                 tags: region.tags,
                 regionData: this.scaleRegionToOriginalSize(region.regionData),
+                attributes: region.attributes,
             };
         });
     }

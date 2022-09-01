@@ -676,7 +676,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Region = void 0;
 const RegionComponent_1 = __webpack_require__(4);
 class Region extends RegionComponent_1.RegionComponent {
-    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, tagsUpdateOptions) {
+    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, attributes, tagsUpdateOptions) {
         super(paper, paperRect, regionData, Object.assign({}, callbacks));
         this.styleSheet = null;
         this.ID = id;
@@ -685,6 +685,7 @@ class Region extends RegionComponent_1.RegionComponent {
         this.styleID = `region_${this.regionID}_style`;
         this.styleSheet = this.insertStyleSheet();
         this.tagsUpdateOptions = tagsUpdateOptions;
+        this.attributes = attributes ? attributes : { test: "test" };
         this.UI = [];
         const onChange = this.callbacks.onChange;
         this.callbacks.onChange = (region, regionData, ...args) => {
@@ -2462,27 +2463,27 @@ class RegionsManager {
     }
     addRectRegion(id, regionData, tagsDescriptor) {
         this.menu.hide();
-        const region = new RectRegion_1.RectRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, this.tagsUpdateOptions);
+        const region = new RectRegion_1.RectRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
     addPointRegion(id, regionData, tagsDescriptor) {
         this.menu.hide();
-        const region = new PointRegion_1.PointRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, this.tagsUpdateOptions);
+        const region = new PointRegion_1.PointRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
     addPolylineRegion(id, regionData, tagsDescriptor) {
         this.menu.hide();
-        const region = new PolylineRegion_1.PolylineRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, this.tagsUpdateOptions);
+        const region = new PolylineRegion_1.PolylineRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
     addPolygonRegion(id, regionData, tagsDescriptor) {
         this.menu.hide();
-        const region = new PolygonRegion_1.PolygonRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, this.tagsUpdateOptions);
+        const region = new PolygonRegion_1.PolygonRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
     addPathRegion(id, regionData, tagsDescriptor) {
         this.menu.hide();
-        const region = new PathRegion_1.PathRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, this.tagsUpdateOptions);
+        const region = new PathRegion_1.PathRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
     redrawAllRegions() {
@@ -2511,6 +2512,7 @@ class RegionsManager {
                 id: region.ID,
                 tags: region.tags,
                 regionData: this.scaleRegionToOriginalSize(region.regionData),
+                attributes: undefined,
             };
         });
     }
@@ -3085,14 +3087,22 @@ const Region_1 = __webpack_require__(6);
 const DragElement_1 = __webpack_require__(46);
 const TagsElement_1 = __webpack_require__(47);
 class PointRegion extends Region_1.Region {
-    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, tagsUpdateOptions) {
-        super(paper, paperRect, regionData, callbacks, id, tagsDescriptor, tagsUpdateOptions);
+    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, attributes, tagsUpdateOptions) {
+        super(paper, paperRect, regionData, callbacks, id, tagsDescriptor, attributes, tagsUpdateOptions);
         this.buildOn(paper);
     }
     updateTags(tags, options) {
         super.updateTags(tags, options);
         this.tagsNode.updateTags(tags, options);
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
+    }
+    updateAttribute(key, value) {
+        if (key && value) {
+            this.attributes[key] = value;
+        }
+        else if (value === undefined && this.attributes[key]) {
+            delete this.attributes[key];
+        }
     }
     buildOn(paper) {
         this.node = paper.g();
@@ -3102,6 +3112,7 @@ class PointRegion extends Region_1.Region {
         this.tagsNode = new TagsElement_1.TagsElement(paper, this.paperRect, this.regionData, this.tags, this.styleID, this.styleSheet, this.tagsUpdateOptions);
         this.toolTip = Snap.parse(`<title>${(this.tags !== null) ? this.tags.toString() : ""}</title>`);
         this.node.append(this.toolTip);
+        this.node.append(Snap.parse(`<desc${Object.keys(this.attributes).map(key => ' data-attribute-' + key + '="' + this.attributes[key] + '"')}></desc>`));
         this.node.add(this.dragNode.node);
         this.node.add(this.tagsNode.node);
         this.UI.push(this.tagsNode, this.dragNode);
@@ -3124,8 +3135,8 @@ const AnchorsElements_1 = __webpack_require__(55);
 const DragElement_1 = __webpack_require__(56);
 const TagsElement_1 = __webpack_require__(57);
 class RectRegion extends Region_1.Region {
-    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, tagsUpdateOptions) {
-        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, tagsUpdateOptions);
+    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, attributes, tagsUpdateOptions) {
+        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, attributes, tagsUpdateOptions);
         if (paperRect !== null) {
             this.paperRects = {
                 actual: new Rect_1.Rect(paperRect.width - regionData.width, paperRect.height - regionData.height),
@@ -3144,6 +3155,14 @@ class RectRegion extends Region_1.Region {
         this.tagsNode.updateTags(tags, options);
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
+    updateAttribute(key, value) {
+        if (key && value) {
+            this.attributes[key] = value;
+        }
+        else if (value === undefined && this.attributes[key]) {
+            delete this.attributes[key];
+        }
+    }
     resize(width, height) {
         this.paperRects.actual.resize(this.paperRects.host.width - width, this.paperRects.host.height - height);
         super.resize(width, height);
@@ -3157,6 +3176,7 @@ class RectRegion extends Region_1.Region {
         this.tagsNode = new TagsElement_1.TagsElement(paper, this.paperRects.host, this.regionData, this.tags, this.styleID, this.styleSheet, this.tagsUpdateOptions);
         this.toolTip = Snap.parse(`<title>${(this.tags !== null) ? this.tags.toString() : ""}</title>`);
         this.node.append(this.toolTip);
+        this.node.append(Snap.parse(`<desc${Object.keys(this.attributes).map(key => ' data-attribute-' + key + '="' + this.attributes[key] + '"')}></desc>`));
         this.node.add(this.tagsNode.node);
         this.node.add(this.dragNode.node);
         this.node.add(this.anchorNode.node);
@@ -4795,8 +4815,8 @@ const AnchorsElement_1 = __webpack_require__(41);
 const MidpointElement_1 = __webpack_require__(43);
 const TagsElement_1 = __webpack_require__(45);
 class PathRegion extends Region_1.Region {
-    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, tagsUpdateOptions) {
-        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, tagsUpdateOptions);
+    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, attributes, tagsUpdateOptions) {
+        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, attributes, tagsUpdateOptions);
         if (paperRect !== null) {
             this.paperRects = {
                 actual: new Rect_1.Rect(paperRect.width - regionData.width, paperRect.height - regionData.height),
@@ -4815,6 +4835,14 @@ class PathRegion extends Region_1.Region {
         this.tagsNode.updateTags(tags, options);
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
+    updateAttribute(key, value) {
+        if (key && value) {
+            this.attributes[key] = value;
+        }
+        else if (value === undefined && this.attributes[key]) {
+            delete this.attributes[key];
+        }
+    }
     resize(width, height) {
         this.paperRects.actual.resize(this.paperRects.host.width - width, this.paperRects.host.height - height);
         super.resize(width, height);
@@ -4829,6 +4857,7 @@ class PathRegion extends Region_1.Region {
         this.midpointNode = new MidpointElement_1.MidpointElement(paper, this.paperRect, this.regionData, this.callbacks);
         this.toolTip = Snap.parse(`<title>${(this.tags !== null) ? this.tags.toString() : ""}</title>`);
         this.node.append(this.toolTip);
+        this.node.append(Snap.parse(`<desc${Object.keys(this.attributes).map(key => ' data-attribute-' + key + '="' + this.attributes[key] + '"')}></desc>`));
         this.node.add(this.dragNode.node);
         this.node.add(this.tagsNode.node);
         this.node.add(this.anchorNode.node);
@@ -5871,8 +5900,8 @@ const AnchorsElement_1 = __webpack_require__(49);
 const DragElement_1 = __webpack_require__(26);
 const TagsElement_1 = __webpack_require__(50);
 class PolygonRegion extends Region_1.Region {
-    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, tagsUpdateOptions) {
-        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, tagsUpdateOptions);
+    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, attributes, tagsUpdateOptions) {
+        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, attributes, tagsUpdateOptions);
         if (paperRect !== null) {
             this.paperRects = {
                 actual: new Rect_1.Rect(paperRect.width - regionData.width, paperRect.height - regionData.height),
@@ -5891,6 +5920,14 @@ class PolygonRegion extends Region_1.Region {
         this.tagsNode.updateTags(tags, options);
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
+    updateAttribute(key, value) {
+        if (key && value) {
+            this.attributes[key] = value;
+        }
+        else if (value === undefined && this.attributes[key]) {
+            delete this.attributes[key];
+        }
+    }
     resize(width, height) {
         this.paperRects.actual.resize(this.paperRects.host.width - width, this.paperRects.host.height - height);
         super.resize(width, height);
@@ -5904,6 +5941,7 @@ class PolygonRegion extends Region_1.Region {
         this.anchorNode = new AnchorsElement_1.AnchorsElement(paper, this.paperRect, this.regionData, this.callbacks);
         this.toolTip = Snap.parse(`<title>${(this.tags !== null) ? this.tags.toString() : ""}</title>`);
         this.node.append(this.toolTip);
+        this.node.append(Snap.parse(`<desc${Object.keys(this.attributes).map(key => ' data-attribute-' + key + '="' + this.attributes[key] + '"')}></desc>`));
         this.node.add(this.dragNode.node);
         this.node.add(this.tagsNode.node);
         this.node.add(this.anchorNode.node);
@@ -6419,8 +6457,8 @@ const AnchorsElement_1 = __webpack_require__(52);
 const DragElement_1 = __webpack_require__(53);
 const TagsElement_1 = __webpack_require__(54);
 class PolylineRegion extends Region_1.Region {
-    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, tagsUpdateOptions) {
-        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, tagsUpdateOptions);
+    constructor(paper, paperRect = null, regionData, callbacks, id, tagsDescriptor, attributes, tagsUpdateOptions) {
+        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, attributes, tagsUpdateOptions);
         if (paperRect !== null) {
             this.paperRects = {
                 actual: new Rect_1.Rect(paperRect.width - regionData.width, paperRect.height - regionData.height),
@@ -6439,6 +6477,14 @@ class PolylineRegion extends Region_1.Region {
         this.tagsNode.updateTags(tags, options);
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
+    updateAttribute(key, value) {
+        if (key && value) {
+            this.attributes[key] = value;
+        }
+        else if (value === undefined && this.attributes[key]) {
+            delete this.attributes[key];
+        }
+    }
     resize(width, height) {
         this.paperRects.actual.resize(this.paperRects.host.width - width, this.paperRects.host.height - height);
         super.resize(width, height);
@@ -6452,6 +6498,7 @@ class PolylineRegion extends Region_1.Region {
         this.anchorNode = new AnchorsElement_1.AnchorsElement(paper, this.paperRect, this.regionData, this.callbacks);
         this.toolTip = Snap.parse(`<title>${(this.tags !== null) ? this.tags.toString() : ""}</title>`);
         this.node.append(this.toolTip);
+        this.node.append(Snap.parse(`<desc${Object.keys(this.attributes).map(key => ' data-attribute-' + key + '="' + this.attributes[key] + '"')}></desc>`));
         this.node.add(this.dragNode.node);
         this.node.add(this.tagsNode.node);
         this.node.add(this.anchorNode.node);

@@ -6,6 +6,7 @@ import { ITagsUpdateOptions } from "../../Interface/ITagsUpdateOptions";
 import { RegionComponent } from "../Component/RegionComponent";
 import { DragElement } from "../Polygon/DragElement";
 import { Region } from "../Region";
+import { RegionAttribute } from './../../Core/RegionAttribute';
 import { AnchorsElement } from "./AnchorsElement";
 import { MidpointElement } from "./MidpointElement";
 import { TagsElement } from "./TagsElement";
@@ -55,8 +56,9 @@ export class PathRegion extends Region {
      * @param tagsUpdateOptions - The drawing options for tags.
      */
     constructor(paper: Snap.Paper, paperRect: Rect = null, regionData: RegionData, callbacks: IRegionCallbacks,
-        id: string, tagsDescriptor: TagsDescriptor, tagsUpdateOptions?: ITagsUpdateOptions) {
-        super(paper, paperRect, regionData, Object.assign({}, callbacks), id, tagsDescriptor, tagsUpdateOptions);
+        id: string, tagsDescriptor: TagsDescriptor, attributes: RegionAttribute, tagsUpdateOptions?: ITagsUpdateOptions) {
+        super(paper, paperRect, regionData, Object.assign({}, callbacks),
+            id, tagsDescriptor, attributes, tagsUpdateOptions);
 
         if (paperRect !== null) {
             this.paperRects = {
@@ -86,6 +88,14 @@ export class PathRegion extends Region {
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
 
+    public updateAttribute(key: string, value: string) {
+        if (key && value) {
+            this.attributes[key] = value;
+        } else if (value === undefined && this.attributes[key]) {
+            delete this.attributes[key];
+        }
+    }
+
     /**
      * Resizes the region to specified `width` and `height`.
      * @param width - The new region width.
@@ -113,6 +123,7 @@ export class PathRegion extends Region {
 
         this.toolTip = Snap.parse(`<title>${(this.tags !== null) ? this.tags.toString() : ""}</title>`);
         this.node.append(this.toolTip as any);
+        this.node.append(Snap.parse(`<desc${Object.keys(this.attributes).map(key => ' data-attribute-'+key+'="'+this.attributes[key]+'"')}></desc>`) as any);
 
         this.node.add(this.dragNode.node);
         this.node.add(this.tagsNode.node);
