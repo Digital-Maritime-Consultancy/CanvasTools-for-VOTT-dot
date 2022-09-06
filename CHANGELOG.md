@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.1.6
+### 0.1.6 & 0.1.7
 * Public API for region attribute update
 
 ### 0.1.5

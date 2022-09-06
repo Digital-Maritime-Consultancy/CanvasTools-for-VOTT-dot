@@ -78,6 +78,18 @@ export class PathRegion extends Region {
     }
 
     /**
+     * Updates region attribute.
+     * @param key - The attribute key to update.
+     * @param value - The attribute value to update.
+     */
+    public updateAttribute(key: string, value: string): void {
+        if (key) {
+            super.updateAttribute(key, value);
+            this.node.select("desc").node.setAttribute('data-attribute-'+key, value);
+        }
+    }
+
+    /**
      * Updates region tags.
      * @param tags - The new tags descriptor object.
      * @param options - The tags drawing options.

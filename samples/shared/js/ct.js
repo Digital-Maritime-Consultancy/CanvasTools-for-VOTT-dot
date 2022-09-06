@@ -701,6 +701,14 @@ class Region extends RegionComponent_1.RegionComponent {
         this.tags = tags;
         this.tagsUpdateOptions = options;
     }
+    updateAttribute(key, value) {
+        if (key && value) {
+            this.attributes[key] = value;
+        }
+        else if (value === undefined && this.attributes[key]) {
+            delete this.attributes[key];
+        }
+    }
     move(arg1, arg2) {
         super.move(arg1, arg2);
         this.redraw();
@@ -2512,7 +2520,7 @@ class RegionsManager {
                 id: region.ID,
                 tags: region.tags,
                 regionData: this.scaleRegionToOriginalSize(region.regionData),
-                attributes: undefined,
+                attributes: region.attributes,
             };
         });
     }
@@ -2566,6 +2574,12 @@ class RegionsManager {
         const region = this.lookupRegionByID(id);
         if (region != null) {
             region.updateTags(tagsDescriptor, this.tagsUpdateOptions);
+        }
+    }
+    updateAttributeById(id, key, value) {
+        const region = this.lookupRegionByID(id);
+        if (region != null && key != null) {
+            region.updateAttribute(key, value);
         }
     }
     updateTagsForSelectedRegions(tagsDescriptor) {
@@ -3097,11 +3111,9 @@ class PointRegion extends Region_1.Region {
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
     updateAttribute(key, value) {
-        if (key && value) {
-            this.attributes[key] = value;
-        }
-        else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
+        if (key) {
+            super.updateAttribute(key, value);
+            this.node.select("desc").node.setAttribute('data-attribute-' + key, value);
         }
     }
     buildOn(paper) {
@@ -3156,11 +3168,9 @@ class RectRegion extends Region_1.Region {
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
     updateAttribute(key, value) {
-        if (key && value) {
-            this.attributes[key] = value;
-        }
-        else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
+        if (key) {
+            super.updateAttribute(key, value);
+            this.node.select("desc").node.setAttribute('data-attribute-' + key, value);
         }
     }
     resize(width, height) {
@@ -4830,18 +4840,16 @@ class PathRegion extends Region_1.Region {
             onChange(this, regionData, ...args);
         };
     }
+    updateAttribute(key, value) {
+        if (key) {
+            super.updateAttribute(key, value);
+            this.node.select("desc").node.setAttribute('data-attribute-' + key, value);
+        }
+    }
     updateTags(tags, options) {
         super.updateTags(tags, options);
         this.tagsNode.updateTags(tags, options);
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
-    }
-    updateAttribute(key, value) {
-        if (key && value) {
-            this.attributes[key] = value;
-        }
-        else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
-        }
     }
     resize(width, height) {
         this.paperRects.actual.resize(this.paperRects.host.width - width, this.paperRects.host.height - height);
@@ -5921,11 +5929,9 @@ class PolygonRegion extends Region_1.Region {
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
     updateAttribute(key, value) {
-        if (key && value) {
-            this.attributes[key] = value;
-        }
-        else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
+        if (key) {
+            super.updateAttribute(key, value);
+            this.node.select("desc").node.setAttribute('data-attribute-' + key, value);
         }
     }
     resize(width, height) {
@@ -6478,11 +6484,9 @@ class PolylineRegion extends Region_1.Region {
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
     updateAttribute(key, value) {
-        if (key && value) {
-            this.attributes[key] = value;
-        }
-        else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
+        if (key) {
+            super.updateAttribute(key, value);
+            this.node.select("desc").node.setAttribute('data-attribute-' + key, value);
         }
     }
     resize(width, height) {
