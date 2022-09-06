@@ -169,17 +169,17 @@ export class RegionsManager {
      * @param regionData - The `RegionData` object defining region.
      * @param tagsDescriptor - The tags descriptor object.
      */
-    public addRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor) {
+    public addRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor, attributes?: RegionAttribute) {
         if (regionData.type === RegionDataType.Point) {
-            this.addPointRegion(id, regionData, tagsDescriptor);
+            this.addPointRegion(id, regionData, tagsDescriptor, attributes);
         } else if (regionData.type === RegionDataType.Polyline) {
-            this.addPolylineRegion(id, regionData, tagsDescriptor);
+            this.addPolylineRegion(id, regionData, tagsDescriptor, attributes);
         } else if (regionData.type === RegionDataType.Rect) {
-            this.addRectRegion(id, regionData, tagsDescriptor);
+            this.addRectRegion(id, regionData, tagsDescriptor, attributes);
         } else if (regionData.type === RegionDataType.Polygon) {
-            this.addPolygonRegion(id, regionData, tagsDescriptor);
+            this.addPolygonRegion(id, regionData, tagsDescriptor, attributes);
         } else if (regionData.type === RegionDataType.Path) {
-            this.addPathRegion(id, regionData, tagsDescriptor);
+            this.addPathRegion(id, regionData, tagsDescriptor, attributes);
         }
         this.sortRegionsByArea();
         if (this.regionAnnouncer) {
@@ -193,11 +193,11 @@ export class RegionsManager {
      * @param regionData - The `RegionData` object defining region.
      * @param tagsDescriptor - The tags descriptor object.
      */
-    public addRectRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor) {
+    public addRectRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor, attributes?: RegionAttribute) {
         this.menu.hide();
 
         const region = new RectRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                      {}, this.tagsUpdateOptions);
+            attributes? attributes : {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -208,11 +208,11 @@ export class RegionsManager {
      * @param regionData - The `RegionData` object defining region.
      * @param tagsDescriptor - The tags descriptor object.
      */
-    public addPointRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor) {
+    public addPointRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor, attributes?: RegionAttribute) {
         this.menu.hide();
 
         const region = new PointRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                       {}, this.tagsUpdateOptions);
+            attributes? attributes : {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -223,11 +223,11 @@ export class RegionsManager {
      * @param regionData - The `RegionData` object defining region.
      * @param tagsDescriptor - The tags descriptor object.
      */
-    public addPolylineRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor) {
+    public addPolylineRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor, attributes?: RegionAttribute) {
         this.menu.hide();
 
         const region = new PolylineRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                          {}, this.tagsUpdateOptions);
+            attributes? attributes : {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -238,11 +238,11 @@ export class RegionsManager {
      * @param regionData - The `RegionData` object defining region.
      * @param tagsDescriptor - The tags descriptor object.
      */
-    public addPolygonRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor) {
+    public addPolygonRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor, attributes?: RegionAttribute) {
         this.menu.hide();
 
         const region = new PolygonRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                         {}, this.tagsUpdateOptions);
+            attributes? attributes : {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
@@ -253,11 +253,11 @@ export class RegionsManager {
      * @param regionData - The `RegionData` object defining region.
      * @param tagsDescriptor - The tags descriptor object.
      */
-     public addPathRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor) {
+     public addPathRegion(id: string, regionData: RegionData, tagsDescriptor: TagsDescriptor, attributes?: RegionAttribute) {
         this.menu.hide();
 
         const region = new PathRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor,
-                                         {}, this.tagsUpdateOptions);
+            attributes? attributes : {}, this.tagsUpdateOptions);
 
         this.registerRegion(region);
     }
