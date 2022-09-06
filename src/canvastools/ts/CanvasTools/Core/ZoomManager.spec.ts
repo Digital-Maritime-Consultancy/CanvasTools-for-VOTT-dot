@@ -4,7 +4,7 @@ describe("Zoom manager tests", () => {
     const maxZoom = 5;
     const zoomScale = 2;
     const getZoomManager = () => {
-        const zoomManagerInstance = ZoomManager.getInstance(true, undefined, maxZoom, zoomScale);
+        const zoomManagerInstance = ZoomManager.getInstance(true, undefined, undefined, maxZoom, zoomScale);
         return zoomManagerInstance;
     };
 

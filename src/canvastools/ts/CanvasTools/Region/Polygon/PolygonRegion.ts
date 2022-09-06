@@ -82,14 +82,6 @@ export class PolygonRegion extends Region {
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
 
-    public updateAttribute(key: string, value: string) {
-        if (key && value) {
-            this.attributes[key] = value;
-        } else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
-        }
-    }
-
     /**
      * Resizes the region to specified `width` and `height`.
      * @param width - The new region width.

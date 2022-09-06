@@ -396,6 +396,20 @@ export class RegionsManager {
     }
 
     /**
+     * Updates attributes of the specified region.
+     * @param id - The `id` of the region to update.
+     * @param key - The key of attribute to update.
+     * @param value - The value of attribute to update.
+     */
+     public updateAttributeById(id: string, key: string, value: string) {
+        const region = this.lookupRegionByID(id);
+
+        if (region != null && key != null) {
+            region.updateAttribute(key, value);
+        }
+    }
+
+    /**
      * Updates tags for all selected regions.
      * @param tagsDescriptor - The new tags descriptor object.
      */

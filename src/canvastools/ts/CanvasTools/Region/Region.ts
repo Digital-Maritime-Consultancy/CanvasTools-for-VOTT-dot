@@ -104,6 +104,19 @@ export abstract class Region extends RegionComponent {
     }
 
     /**
+     * Updates region attribute.
+     * @param key - The key of attribute.
+     * @param value - The value of attribute.
+     */
+    public updateAttribute(key: string, value: string) {
+        if (key && value) {
+            this.attributes[key] = value;
+        } else if (value === undefined && this.attributes[key]) {
+            delete this.attributes[key];
+        }
+    }
+
+    /**
      * Move region to specified location.
      * @param point - New region location.
      */

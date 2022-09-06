@@ -59,14 +59,6 @@ export class PointRegion extends Region {
         this.node.select("title").node.innerHTML = (tags !== null) ? tags.toString() : "";
     }
 
-    public updateAttribute(key: string, value: string) {
-        if (key && value) {
-            this.attributes[key] = value;
-        } else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
-        }
-    }
-
     /**
      * Creates the UI of the region component.
      * @param paper - The `Snap.Paper` element to draw on.
