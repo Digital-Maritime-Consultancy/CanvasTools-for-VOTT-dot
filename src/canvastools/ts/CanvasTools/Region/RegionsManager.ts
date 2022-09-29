@@ -337,6 +337,7 @@ export class RegionsManager {
                 id: region.ID,
                 tags: region.tags,
                 regionData: this.scaleRegionToOriginalSize(region.regionData),
+                attributes: region.attributes,
             };
         });
     }
@@ -350,6 +351,7 @@ export class RegionsManager {
                 id: region.ID,
                 tags: region.tags,
                 regionData: region.regionData,
+                attributes: region.attributes,
             };
         });
     }
