@@ -1,7 +1,7 @@
 ## Changelog
 
-### 0.1.8
-* Support of attributes in addRegion func
+### 0.1.8 & 0.1.9
+* Support of attributes in region export
 
 ### 0.1.6 & 0.1.7
 * Public API for region attribute update
