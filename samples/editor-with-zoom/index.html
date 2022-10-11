@@ -189,7 +189,7 @@
             });
 
             // Delete current regions on image change
-            editor.deleteAllRegions();
+            editor.RM.deleteAllRegions();
         });
 
         // Load first image
@@ -215,7 +215,7 @@
 
         var showZoomDiv = document.getElementById("showZoomFactor");
         editor.onZoomEnd = function (zoom) {
-            showZoomDiv.innerText = "Image zoomed at " + zoom.currentZoomScale*100 + " %";
+            showZoomDiv.innerText = "Image zoomed at " + zoom.currentZoomScale*100 + " %, centered at (" + zoom.zoomCenter.x + ", " + zoom.zoomCenter.y + ")";
         }
 
         // check if reset zoom is On.

@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.1.10
+* Inclusion of center point into zoom data
+
 ### 0.1.8 & 0.1.9
 * Support of attributes in region export
 

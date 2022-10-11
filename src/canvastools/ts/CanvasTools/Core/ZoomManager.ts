@@ -8,6 +8,7 @@ export interface ZoomData {
     maxZoomScale: number;
     previousZoomScale: number;
     currentZoomScale: number;
+    zoomCenter: CursorPosition;
 }
 
 export interface ZoomProperties {
@@ -77,6 +78,7 @@ export class ZoomManager {
      * @param zoomCallbacks - [Optional] The collection of zoom callbacks.
      * @param maxZoom - [Optional] Maximum  zoom factor.
      * @param zoomScale - [Optional] Incremental/Decremental zoom factor.
+     * @param zoomCenter - [Optional] Center of zooming
      */
     public static getInstance(
         isZoomEnabled = false,
@@ -84,10 +86,11 @@ export class ZoomManager {
         zoomCallbacks?: IZoomCallbacks,
         maxZoom?: number,
         zoomScale?: number,
+        zoomCenter? : CursorPosition,
     ) {
         if (!ZoomManager.instance) {
             ZoomManager.instance = new ZoomManager(isZoomEnabled, editorContainerDiv,
-                zoomCallbacks, maxZoom, zoomScale);
+                zoomCallbacks, maxZoom, zoomScale, zoomCenter);
         }
         return ZoomManager.instance;
     }
@@ -140,6 +143,8 @@ export class ZoomManager {
      */
     private previousZoomScale: number;
 
+    private zoomCenter: CursorPosition;
+
      /**
       * boolean that states if the zoom needs to be reset on content update. Defaults to false.
       */
@@ -150,13 +155,14 @@ export class ZoomManager {
     private pos = { top: 0, left: 0, x: 0, y: 0 };
 
     private constructor(isZoomEnabled = false, zoomCanvas: HTMLDivElement,
-            zoomCallbacks?: IZoomCallbacks, maxZoom?: number, zoomScale?: number) {
+            zoomCallbacks?: IZoomCallbacks, maxZoom?: number, zoomScale?: number, zoomCenter?: CursorPosition) {
         this.isZoomEnabled = isZoomEnabled;
         this.zoomCanvas = zoomCanvas;
         this.maxZoomScale = maxZoom ? maxZoom : this.maxZoomScale;
         this.zoomScale = zoomScale ? zoomScale : this.zoomScale;
         this.currentZoomScale = this.minZoomScale;
         this.previousZoomScale = this.minZoomScale;
+        this.zoomCenter = zoomCenter ? zoomCenter : {x: 0, y: 0};
         this.callbacks = zoomCallbacks;
         this.shouldResetZoomOnContentLoad = false;
     }
@@ -166,11 +172,14 @@ export class ZoomManager {
      * @param zoomType - The direction of zoom.
      * @returns - Zoom data object.
      */
-    public updateZoomScale(zoomType: ZoomDirection, newScale?: number): ZoomData {
+    public updateZoomScale(zoomType: ZoomDirection, newScale?: number, cursorPos?: CursorPosition): ZoomData {
         this.previousZoomScale = this.currentZoomScale;
         const zoomData = this.getZoomData();
 
         let updatedZoomScale;
+        if (cursorPos) {
+            zoomData.zoomCenter = cursorPos;
+        }
         if (newScale) {
             updatedZoomScale = newScale;
         } else {
@@ -215,7 +224,12 @@ export class ZoomManager {
             maxZoomScale: this.maxZoomScale,
             currentZoomScale: this.currentZoomScale,
             previousZoomScale: this.previousZoomScale,
+            zoomCenter: this.zoomCenter,
         };
+    }
+
+    public setZoomCenter(center: CursorPosition): void {
+        this.zoomCenter = center;
     }
 
     /**

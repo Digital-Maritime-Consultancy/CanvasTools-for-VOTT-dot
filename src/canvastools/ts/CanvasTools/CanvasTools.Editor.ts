@@ -1023,7 +1023,7 @@ export class Editor {
             throw new Error("Zoom feature is not enabled");
         }
 
-        const zoomData = this.zoomManager.updateZoomScale(zoomType, newScale);
+        const zoomData = this.zoomManager.updateZoomScale(zoomType, newScale, cursorPos);
         if (zoomData) {
             const scaledFrameWidth = (this.frameWidth / zoomData.previousZoomScale) * zoomData.currentZoomScale;
             const scaledFrameHeight = (this.frameHeight / zoomData.previousZoomScale) * zoomData.currentZoomScale;
@@ -1073,6 +1073,9 @@ export class Editor {
         if (!this.editorContainerDiv && !this.editorContainerDiv.offsetWidth) {
             this.editorContainerDiv = document.getElementsByClassName("CanvasToolsContainer")[0] as HTMLDivElement;
             this.editorDiv = document.getElementsByClassName("CanvasToolsEditor")[0] as HTMLDivElement;
+        }
+        if (cursorPos) {
+            this.ZM.setZoomCenter(cursorPos);
         }
         if (this.editorContainerDiv) {
             // scroll

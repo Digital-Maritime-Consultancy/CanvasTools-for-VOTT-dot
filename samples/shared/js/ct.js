@@ -2258,7 +2258,7 @@ var ZoomType;
     ZoomType[ZoomType["CursorCenter"] = 3] = "CursorCenter";
 })(ZoomType = exports.ZoomType || (exports.ZoomType = {}));
 class ZoomManager {
-    constructor(isZoomEnabled = false, zoomCanvas, zoomCallbacks, maxZoom, zoomScale) {
+    constructor(isZoomEnabled = false, zoomCanvas, zoomCallbacks, maxZoom, zoomScale, zoomCenter) {
         this.minZoomScale = 1;
         this.maxZoomScale = 4;
         this.zoomScale = 0.1;
@@ -2295,6 +2295,7 @@ class ZoomManager {
         this.zoomScale = zoomScale ? zoomScale : this.zoomScale;
         this.currentZoomScale = this.minZoomScale;
         this.previousZoomScale = this.minZoomScale;
+        this.zoomCenter = zoomCenter ? zoomCenter : { x: 0, y: 0 };
         this.callbacks = zoomCallbacks;
         this.shouldResetZoomOnContentLoad = false;
     }
@@ -2308,16 +2309,19 @@ class ZoomManager {
         }
     }
     ;
-    static getInstance(isZoomEnabled = false, editorContainerDiv, zoomCallbacks, maxZoom, zoomScale) {
+    static getInstance(isZoomEnabled = false, editorContainerDiv, zoomCallbacks, maxZoom, zoomScale, zoomCenter) {
         if (!ZoomManager.instance) {
-            ZoomManager.instance = new ZoomManager(isZoomEnabled, editorContainerDiv, zoomCallbacks, maxZoom, zoomScale);
+            ZoomManager.instance = new ZoomManager(isZoomEnabled, editorContainerDiv, zoomCallbacks, maxZoom, zoomScale, zoomCenter);
         }
         return ZoomManager.instance;
     }
-    updateZoomScale(zoomType, newScale) {
+    updateZoomScale(zoomType, newScale, cursorPos) {
         this.previousZoomScale = this.currentZoomScale;
         const zoomData = this.getZoomData();
         let updatedZoomScale;
+        if (cursorPos) {
+            zoomData.zoomCenter = cursorPos;
+        }
         if (newScale) {
             updatedZoomScale = newScale;
         }
@@ -2347,7 +2351,11 @@ class ZoomManager {
             maxZoomScale: this.maxZoomScale,
             currentZoomScale: this.currentZoomScale,
             previousZoomScale: this.previousZoomScale,
+            zoomCenter: this.zoomCenter,
         };
+    }
+    setZoomCenter(center) {
+        this.zoomCenter = center;
     }
     deleteInstance() {
         if (ZoomManager.instance) {
@@ -2448,50 +2456,50 @@ class RegionsManager {
     get isFocused() {
         return this.isFocusedState;
     }
-    addRegion(id, regionData, tagsDescriptor) {
+    addRegion(id, regionData, tagsDescriptor, attributes) {
         if (regionData.type === RegionData_1.RegionDataType.Point) {
-            this.addPointRegion(id, regionData, tagsDescriptor);
+            this.addPointRegion(id, regionData, tagsDescriptor, attributes);
         }
         else if (regionData.type === RegionData_1.RegionDataType.Polyline) {
-            this.addPolylineRegion(id, regionData, tagsDescriptor);
+            this.addPolylineRegion(id, regionData, tagsDescriptor, attributes);
         }
         else if (regionData.type === RegionData_1.RegionDataType.Rect) {
-            this.addRectRegion(id, regionData, tagsDescriptor);
+            this.addRectRegion(id, regionData, tagsDescriptor, attributes);
         }
         else if (regionData.type === RegionData_1.RegionDataType.Polygon) {
-            this.addPolygonRegion(id, regionData, tagsDescriptor);
+            this.addPolygonRegion(id, regionData, tagsDescriptor, attributes);
         }
         else if (regionData.type === RegionData_1.RegionDataType.Path) {
-            this.addPathRegion(id, regionData, tagsDescriptor);
+            this.addPathRegion(id, regionData, tagsDescriptor, attributes);
         }
         this.sortRegionsByArea();
         if (this.regionAnnouncer) {
             this.regionAnnouncer.innerHTML = tagsDescriptor.toString();
         }
     }
-    addRectRegion(id, regionData, tagsDescriptor) {
+    addRectRegion(id, regionData, tagsDescriptor, attributes) {
         this.menu.hide();
-        const region = new RectRegion_1.RectRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
+        const region = new RectRegion_1.RectRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, attributes ? attributes : {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
-    addPointRegion(id, regionData, tagsDescriptor) {
+    addPointRegion(id, regionData, tagsDescriptor, attributes) {
         this.menu.hide();
-        const region = new PointRegion_1.PointRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
+        const region = new PointRegion_1.PointRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, attributes ? attributes : {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
-    addPolylineRegion(id, regionData, tagsDescriptor) {
+    addPolylineRegion(id, regionData, tagsDescriptor, attributes) {
         this.menu.hide();
-        const region = new PolylineRegion_1.PolylineRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
+        const region = new PolylineRegion_1.PolylineRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, attributes ? attributes : {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
-    addPolygonRegion(id, regionData, tagsDescriptor) {
+    addPolygonRegion(id, regionData, tagsDescriptor, attributes) {
         this.menu.hide();
-        const region = new PolygonRegion_1.PolygonRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
+        const region = new PolygonRegion_1.PolygonRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, attributes ? attributes : {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
-    addPathRegion(id, regionData, tagsDescriptor) {
+    addPathRegion(id, regionData, tagsDescriptor, attributes) {
         this.menu.hide();
-        const region = new PathRegion_1.PathRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, {}, this.tagsUpdateOptions);
+        const region = new PathRegion_1.PathRegion(this.paper, this.paperRect, regionData, this.callbacks, id, tagsDescriptor, attributes ? attributes : {}, this.tagsUpdateOptions);
         this.registerRegion(region);
     }
     redrawAllRegions() {
@@ -2542,6 +2550,7 @@ class RegionsManager {
                 id: region.ID,
                 tags: region.tags,
                 regionData: this.scaleRegionToOriginalSize(region.regionData),
+                attributes: region.attributes,
             };
         });
     }
@@ -2551,6 +2560,7 @@ class RegionsManager {
                 id: region.ID,
                 tags: region.tags,
                 regionData: region.regionData,
+                attributes: region.attributes,
             };
         });
     }
@@ -4235,7 +4245,7 @@ class Editor {
         if (!this.zoomManager.isZoomEnabled) {
             throw new Error("Zoom feature is not enabled");
         }
-        const zoomData = this.zoomManager.updateZoomScale(zoomType, newScale);
+        const zoomData = this.zoomManager.updateZoomScale(zoomType, newScale, cursorPos);
         if (zoomData) {
             const scaledFrameWidth = (this.frameWidth / zoomData.previousZoomScale) * zoomData.currentZoomScale;
             const scaledFrameHeight = (this.frameHeight / zoomData.previousZoomScale) * zoomData.currentZoomScale;
@@ -4267,6 +4277,9 @@ class Editor {
         if (!this.editorContainerDiv && !this.editorContainerDiv.offsetWidth) {
             this.editorContainerDiv = document.getElementsByClassName("CanvasToolsContainer")[0];
             this.editorDiv = document.getElementsByClassName("CanvasToolsEditor")[0];
+        }
+        if (cursorPos) {
+            this.ZM.setZoomCenter(cursorPos);
         }
         if (this.editorContainerDiv) {
             this.editorContainerDiv.style.overflow = zoomData.currentZoomScale === 1 ? "hidden" : "auto";
