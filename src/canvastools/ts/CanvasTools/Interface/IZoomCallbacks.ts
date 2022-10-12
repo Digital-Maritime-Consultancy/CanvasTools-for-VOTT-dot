@@ -35,4 +35,9 @@ export interface IZoomCallbacks {
      * Remove event listener for dragging
      */
     onDragDeactivated: () => void;
+
+    /**
+     * Apply screen position
+     */
+    onApplyScreenPos: (scrollLeft: number, scrollTop: number) => void;
 }

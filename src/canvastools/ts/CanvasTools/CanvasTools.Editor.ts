@@ -738,6 +738,10 @@ export class Editor {
                 }
                 this.regionsManager.unfreeze();
                 this.zoomManager.setDragging(false);
+            },
+            onApplyScreenPos: (scrollLeft: number, scrollTop: number) => {
+                this.editorContainerDiv.scrollLeft = scrollLeft;
+                this.editorContainerDiv.scrollTop = scrollTop;
             }
         };
 
@@ -1023,7 +1027,7 @@ export class Editor {
             throw new Error("Zoom feature is not enabled");
         }
 
-        const zoomData = this.zoomManager.updateZoomScale(zoomType, newScale, cursorPos);
+        const zoomData = this.zoomManager.updateZoomScale(zoomType, newScale);
         if (zoomData) {
             const scaledFrameWidth = (this.frameWidth / zoomData.previousZoomScale) * zoomData.currentZoomScale;
             const scaledFrameHeight = (this.frameHeight / zoomData.previousZoomScale) * zoomData.currentZoomScale;
@@ -1073,9 +1077,6 @@ export class Editor {
         if (!this.editorContainerDiv && !this.editorContainerDiv.offsetWidth) {
             this.editorContainerDiv = document.getElementsByClassName("CanvasToolsContainer")[0] as HTMLDivElement;
             this.editorDiv = document.getElementsByClassName("CanvasToolsEditor")[0] as HTMLDivElement;
-        }
-        if (cursorPos) {
-            this.ZM.setZoomCenter(cursorPos);
         }
         if (this.editorContainerDiv) {
             // scroll
@@ -1200,6 +1201,10 @@ export class Editor {
 
                 this.editorContainerDiv.scrollLeft = expectedScrollPos.left;
                 this.editorContainerDiv.scrollTop = expectedScrollPos.top;
+            }
+
+            if (this.ZM) {
+                this.ZM.setScreenPos(this.editorContainerDiv.scrollLeft, this.editorContainerDiv.scrollTop);
             }
         }
     }

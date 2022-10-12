@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.1.11
+* Having screen position instead of center point
+
 ### 0.1.10
 * Inclusion of center point into zoom data
 

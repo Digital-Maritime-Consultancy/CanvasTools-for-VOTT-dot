@@ -2258,7 +2258,7 @@ var ZoomType;
     ZoomType[ZoomType["CursorCenter"] = 3] = "CursorCenter";
 })(ZoomType = exports.ZoomType || (exports.ZoomType = {}));
 class ZoomManager {
-    constructor(isZoomEnabled = false, zoomCanvas, zoomCallbacks, maxZoom, zoomScale, zoomCenter) {
+    constructor(isZoomEnabled = false, zoomCanvas, zoomCallbacks, maxZoom, zoomScale, screenPos) {
         this.minZoomScale = 1;
         this.maxZoomScale = 4;
         this.zoomScale = 0.1;
@@ -2279,6 +2279,7 @@ class ZoomManager {
             if (this.zoomCanvas) {
                 document.getElementById('svgCanvas').style.cursor = 'grab';
                 this.zoomCanvas.style.removeProperty('user-select');
+                this.screenPos = { left: this.zoomCanvas.scrollLeft, top: this.zoomCanvas.scrollTop };
             }
         };
         this.mouseMoveHandler = (e) => {
@@ -2295,7 +2296,7 @@ class ZoomManager {
         this.zoomScale = zoomScale ? zoomScale : this.zoomScale;
         this.currentZoomScale = this.minZoomScale;
         this.previousZoomScale = this.minZoomScale;
-        this.zoomCenter = zoomCenter ? zoomCenter : { x: 0, y: 0 };
+        this.screenPos = screenPos ? screenPos : { left: 0, top: 0 };
         this.callbacks = zoomCallbacks;
         this.shouldResetZoomOnContentLoad = false;
     }
@@ -2309,19 +2310,16 @@ class ZoomManager {
         }
     }
     ;
-    static getInstance(isZoomEnabled = false, editorContainerDiv, zoomCallbacks, maxZoom, zoomScale, zoomCenter) {
+    static getInstance(isZoomEnabled = false, editorContainerDiv, zoomCallbacks, maxZoom, zoomScale, screenPos) {
         if (!ZoomManager.instance) {
-            ZoomManager.instance = new ZoomManager(isZoomEnabled, editorContainerDiv, zoomCallbacks, maxZoom, zoomScale, zoomCenter);
+            ZoomManager.instance = new ZoomManager(isZoomEnabled, editorContainerDiv, zoomCallbacks, maxZoom, zoomScale, screenPos);
         }
         return ZoomManager.instance;
     }
-    updateZoomScale(zoomType, newScale, cursorPos) {
+    updateZoomScale(zoomType, newScale) {
         this.previousZoomScale = this.currentZoomScale;
         const zoomData = this.getZoomData();
         let updatedZoomScale;
-        if (cursorPos) {
-            zoomData.zoomCenter = cursorPos;
-        }
         if (newScale) {
             updatedZoomScale = newScale;
         }
@@ -2351,11 +2349,11 @@ class ZoomManager {
             maxZoomScale: this.maxZoomScale,
             currentZoomScale: this.currentZoomScale,
             previousZoomScale: this.previousZoomScale,
-            zoomCenter: this.zoomCenter,
+            screenPos: this.screenPos,
         };
     }
-    setZoomCenter(center) {
-        this.zoomCenter = center;
+    setScreenPos(left, top) {
+        this.screenPos = { left, top };
     }
     deleteInstance() {
         if (ZoomManager.instance) {
@@ -4029,6 +4027,10 @@ class Editor {
                 }
                 this.regionsManager.unfreeze();
                 this.zoomManager.setDragging(false);
+            },
+            onApplyScreenPos: (scrollLeft, scrollTop) => {
+                this.editorContainerDiv.scrollLeft = scrollLeft;
+                this.editorContainerDiv.scrollTop = scrollTop;
             }
         };
         this.zoomManager = ZoomManager_1.ZoomManager.getInstance(false, this.editorContainerDiv, initZoomCallbacks);
@@ -4245,7 +4247,7 @@ class Editor {
         if (!this.zoomManager.isZoomEnabled) {
             throw new Error("Zoom feature is not enabled");
         }
-        const zoomData = this.zoomManager.updateZoomScale(zoomType, newScale, cursorPos);
+        const zoomData = this.zoomManager.updateZoomScale(zoomType, newScale);
         if (zoomData) {
             const scaledFrameWidth = (this.frameWidth / zoomData.previousZoomScale) * zoomData.currentZoomScale;
             const scaledFrameHeight = (this.frameHeight / zoomData.previousZoomScale) * zoomData.currentZoomScale;
@@ -4277,9 +4279,6 @@ class Editor {
         if (!this.editorContainerDiv && !this.editorContainerDiv.offsetWidth) {
             this.editorContainerDiv = document.getElementsByClassName("CanvasToolsContainer")[0];
             this.editorDiv = document.getElementsByClassName("CanvasToolsEditor")[0];
-        }
-        if (cursorPos) {
-            this.ZM.setZoomCenter(cursorPos);
         }
         if (this.editorContainerDiv) {
             this.editorContainerDiv.style.overflow = zoomData.currentZoomScale === 1 ? "hidden" : "auto";
@@ -4368,6 +4367,9 @@ class Editor {
                 };
                 this.editorContainerDiv.scrollLeft = expectedScrollPos.left;
                 this.editorContainerDiv.scrollTop = expectedScrollPos.top;
+            }
+            if (this.ZM) {
+                this.ZM.setScreenPos(this.editorContainerDiv.scrollLeft, this.editorContainerDiv.scrollTop);
             }
         }
     }
