@@ -1085,6 +1085,9 @@ class Selector extends Element_1.Element {
             this.hide();
         }
     }
+    isCapturingNow() {
+        return false;
+    }
     subscribeToEvents(listeners) {
         listeners.forEach((e) => {
             e.base.addEventListener(e.event, this.enablify(e.listener.bind(this), e.bypass));
@@ -3237,6 +3240,12 @@ class AreaSelector {
         }
         this.buildUIElements();
     }
+    isCapturing() {
+        if (this.selector !== null) {
+            return this.selector.isCapturingNow();
+        }
+        return false;
+    }
     resize(width, height) {
         const [oldWidth, oldHeight] = [this.boundRect.width, this.boundRect.height];
         if (width !== undefined && height !== undefined) {
@@ -3999,10 +4008,14 @@ class Editor {
         }
         const initZoomCallbacks = {
             onZoomingOut: (cursorPos) => {
-                this.onZoom(ZoomManager_1.ZoomDirection.Out, undefined, cursorPos);
+                if (!this.areaSelector.isCapturing()) {
+                    this.onZoom(ZoomManager_1.ZoomDirection.Out, undefined, cursorPos);
+                }
             },
             onZoomingIn: (cursorPos) => {
-                this.onZoom(ZoomManager_1.ZoomDirection.In, undefined, cursorPos);
+                if (!this.areaSelector.isCapturing()) {
+                    this.onZoom(ZoomManager_1.ZoomDirection.In, undefined, cursorPos);
+                }
             },
             getZoomLevel: () => {
                 return this.zoomManager.getZoomData().currentZoomScale;
@@ -4012,21 +4025,25 @@ class Editor {
                 return this.zoomManager.getZoomData();
             },
             onDragActivated: () => {
-                this.previousSelectionMode = this.AS.getSelectorSettings() ?
-                    this.AS.getSelectorSettings().mode : undefined;
-                this.AS.setSelectionMode(ISelectorSettings_1.SelectionMode.NONE);
-                this.RM.freeze();
-                this.zoomManager.setDragging(true);
+                if (!this.areaSelector.isCapturing()) {
+                    this.previousSelectionMode = this.AS.getSelectorSettings() ?
+                        this.AS.getSelectorSettings().mode : undefined;
+                    this.AS.setSelectionMode(ISelectorSettings_1.SelectionMode.NONE);
+                    this.RM.freeze();
+                    this.zoomManager.setDragging(true);
+                }
             },
             onDragDeactivated: () => {
-                if (this.previousSelectionMode) {
-                    this.AS.setSelectionMode(this.previousSelectionMode);
+                if (!this.areaSelector.isCapturing()) {
+                    if (this.previousSelectionMode) {
+                        this.AS.setSelectionMode(this.previousSelectionMode);
+                    }
+                    else {
+                        this.AS.setSelectionMode(ISelectorSettings_1.SelectionMode.NONE);
+                    }
+                    this.regionsManager.unfreeze();
+                    this.zoomManager.setDragging(false);
                 }
-                else {
-                    this.AS.setSelectionMode(ISelectorSettings_1.SelectionMode.NONE);
-                }
-                this.regionsManager.unfreeze();
-                this.zoomManager.setDragging(false);
             },
             onApplyScreenPos: (scrollLeft, scrollTop) => {
                 this.editorContainerDiv.scrollLeft = scrollLeft;
@@ -7822,6 +7839,9 @@ class PolygonSelector extends Selector_1.Selector {
             this.isCapturing = false;
         }
     }
+    isCapturingNow() {
+        return this.isCapturing;
+    }
     buildUIElements() {
         this.node = this.paper.g();
         this.node.addClass("polygonSelector");
@@ -8028,6 +8048,9 @@ class PolylineSelector extends Selector_1.Selector {
         if (this.isCapturing) {
             this.isCapturing = false;
         }
+    }
+    isCapturingNow() {
+        return this.isCapturing;
     }
     buildUIElements() {
         this.node = this.paper.g();
@@ -8424,6 +8447,9 @@ class RectSelector extends Selector_1.Selector {
     deactivateKeyboardCursor() {
         this.usingKeyboardCursor = false;
         this.curKeyboardCross = null;
+    }
+    isCapturingNow() {
+        return this.capturingState;
     }
     buildUIElements() {
         this.node = this.paper.g();

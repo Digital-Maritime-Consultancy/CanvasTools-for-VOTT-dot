@@ -142,6 +142,10 @@ export class RectSelector extends Selector {
         this.curKeyboardCross = null;
     }
 
+    public isCapturingNow(): boolean {
+        return this.capturingState;
+    }
+
     /**
      * Builds selector's UI.
      */

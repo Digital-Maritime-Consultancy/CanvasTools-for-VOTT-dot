@@ -711,10 +711,14 @@ export class Editor {
         // Init zoom manager 
         const initZoomCallbacks: IZoomCallbacks = {
             onZoomingOut: (cursorPos?: CursorPosition) => {
-                this.onZoom(ZoomDirection.Out, undefined, cursorPos);
+                if (!this.areaSelector.isCapturing()) {
+                    this.onZoom(ZoomDirection.Out, undefined, cursorPos);
+                }
             },
             onZoomingIn: (cursorPos?: CursorPosition) => {
-                this.onZoom(ZoomDirection.In, undefined, cursorPos);
+                if (!this.areaSelector.isCapturing()) {
+                    this.onZoom(ZoomDirection.In, undefined, cursorPos);
+                }
             },
             getZoomLevel: () => {
                 return this.zoomManager.getZoomData().currentZoomScale;
@@ -724,20 +728,24 @@ export class Editor {
                 return this.zoomManager.getZoomData();
             },
             onDragActivated: () => {
-                this.previousSelectionMode = this.AS.getSelectorSettings() ?
+                if (!this.areaSelector.isCapturing()) {
+                    this.previousSelectionMode = this.AS.getSelectorSettings() ?
                     this.AS.getSelectorSettings().mode : undefined;
-                this.AS.setSelectionMode(SelectionMode.NONE);
-                this.RM.freeze();
-                this.zoomManager.setDragging(true);
+                    this.AS.setSelectionMode(SelectionMode.NONE);
+                    this.RM.freeze();
+                    this.zoomManager.setDragging(true);
+                }
             },
             onDragDeactivated: () => {
-                if (this.previousSelectionMode) {
-                    this.AS.setSelectionMode(this.previousSelectionMode);
-                } else {
-                    this.AS.setSelectionMode(SelectionMode.NONE);
+                if (!this.areaSelector.isCapturing()) {
+                    if (this.previousSelectionMode) {
+                        this.AS.setSelectionMode(this.previousSelectionMode);
+                    } else {
+                        this.AS.setSelectionMode(SelectionMode.NONE);
+                    }
+                    this.regionsManager.unfreeze();
+                    this.zoomManager.setDragging(false);
                 }
-                this.regionsManager.unfreeze();
-                this.zoomManager.setDragging(false);
             },
             onApplyScreenPos: (scrollLeft: number, scrollTop: number) => {
                 this.editorContainerDiv.scrollLeft = scrollLeft;

@@ -111,6 +111,13 @@ export class AreaSelector {
         this.buildUIElements();
     }
 
+    public isCapturing(): boolean {
+        if (this.selector !== null) {
+            return this.selector.isCapturingNow();
+        }
+        return false;
+    }
+
     /**
      * Resizes selectors to specified `width` and `height`.
      * @param width - The new `width` for selector.

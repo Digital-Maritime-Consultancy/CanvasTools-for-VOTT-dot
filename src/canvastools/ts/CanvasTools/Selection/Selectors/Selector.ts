@@ -76,6 +76,10 @@ export abstract class Selector extends Element {
         }
     }
 
+    public isCapturingNow(): boolean {
+        return false;
+    }
+
     /**
      * Helper function to subscribe collection of elements to specified listeners.
      * @param listeners - The collection of `IEventDescriptor` objects.

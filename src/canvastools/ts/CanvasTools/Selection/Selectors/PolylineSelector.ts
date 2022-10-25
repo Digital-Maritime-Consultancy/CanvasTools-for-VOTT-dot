@@ -142,6 +142,10 @@ export class PolylineSelector extends Selector {
         }
     }
 
+    public isCapturingNow(): boolean {
+        return this.isCapturing;
+    }
+
     /**
      * Builds selector's UI.
      */

@@ -80,7 +80,7 @@
             isZoomEnabled: true,
             zoomType: 3
         });
-        editor.addToolbar(toolbarContainer, CanvasTools.Editor.RectToolbarSet, "./../shared/media/icons/", false);
+        editor.addToolbar(toolbarContainer, CanvasTools.Editor.FullToolbarSet, "./../shared/media/icons/", false);
 
         let incrementalRegionID = 100;
 
@@ -272,8 +272,11 @@
             e.stopImmediatePropagation();
             e.stopPropagation();
             e.preventDefault();
+        } else {
+            // storing current screen position for restoring later on
+            editor.ZM.setScreenPos(document.getElementsByClassName("CanvasToolsContainer")[0].scrollLeft, document.getElementsByClassName("CanvasToolsContainer")[0].scrollTop);
+            e.preventDefault();
         }
-        editor.ZM.setScreenPos(document.getElementsByClassName("CanvasToolsContainer")[0].scrollLeft, document.getElementsByClassName("CanvasToolsContainer")[0].scrollTop);
     }
 
     function getCursorPos(e) {

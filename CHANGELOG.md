@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.1.12
+* Preventing zoom and drag while manipulating region
+
 ### 0.1.11
 * Having screen position instead of center point
 
