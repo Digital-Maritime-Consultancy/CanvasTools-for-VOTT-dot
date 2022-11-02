@@ -112,7 +112,7 @@ export abstract class Region extends RegionComponent {
         if (key && value) {
             this.attributes[key] = value;
         } else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
+            this.attributes[key] = '';
         }
     }
 

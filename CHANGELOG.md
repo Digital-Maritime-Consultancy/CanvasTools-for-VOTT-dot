@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.1.13
+* Keeping attributes even with an empty value
+
 ### 0.1.12
 * Preventing zoom and drag while manipulating region
 
