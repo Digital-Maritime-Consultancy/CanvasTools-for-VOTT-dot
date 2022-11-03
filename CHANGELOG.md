@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.1.13
+### 0.1.13 & 0.1.14
 * Keeping attributes even with an empty value
 
 ### 0.1.12

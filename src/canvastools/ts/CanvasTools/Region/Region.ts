@@ -109,10 +109,8 @@ export abstract class Region extends RegionComponent {
      * @param value - The value of attribute.
      */
     public updateAttribute(key: string, value: string) {
-        if (key && value) {
+        if (key && value !== undefined) {
             this.attributes[key] = value;
-        } else if (value === undefined && this.attributes[key]) {
-            this.attributes[key] = '';
         }
     }
 

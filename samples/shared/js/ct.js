@@ -702,11 +702,8 @@ class Region extends RegionComponent_1.RegionComponent {
         this.tagsUpdateOptions = options;
     }
     updateAttribute(key, value) {
-        if (key && value) {
+        if (key && value !== undefined) {
             this.attributes[key] = value;
-        }
-        else if (value === undefined && this.attributes[key]) {
-            delete this.attributes[key];
         }
     }
     move(arg1, arg2) {
